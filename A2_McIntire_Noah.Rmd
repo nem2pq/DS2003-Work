@@ -1,0 +1,170 @@
+---
+title: "Assignment 2 - Intro to R (20 pts)"
+author: "Noah McIntire (nem2pq)"
+output: html_document
+---
+
+## Create Vectors
+```{r}
+# Below are vectors of basketball athletes and their total points and total rebounds during one game. 
+
+athleteA <- c(15, 3)
+
+athleteB <- c(20, 5)
+
+athleteC <- c(10, 8)
+
+athleteD <- c(12, 2)
+
+```
+
+## Question 1 (1 point)
+```{r}
+# Combine the 6 vectors into a single vector called 'stats'
+stats<-c(athleteA, athleteB, athleteC, athleteD)
+stats
+```
+
+## Question 2 (1 point)
+```{r}
+# construct a matrix where each athlete is a row. Call this matrix 'stat_matrix'
+
+stat_matrix<-matrix(stats, nrow = 4, byrow = T)
+stat_matrix
+```
+
+
+## Question 3 (1 point)
+```{r}
+# Name the rows the respective athletes
+name<- c("athleteA", "athleteB", "athleteC", "athleteD")
+rownames(stat_matrix)<-name
+
+stat_matrix
+```
+
+## Question 4 (1 point)
+```{r}
+# Name the columns 'points' and 'rebounds'
+name2 <- c("points", "rebounds")
+colnames(stat_matrix)<- name2
+stat_matrix
+```
+
+## Question 5 (2 points)
+```{r}
+# Create a 5th athlete and add their points and rebounds to the stats_matrix
+athleteE <- c(13, 4)
+stat_matrix<-rbind(stat_matrix, athleteE)
+stat_matrix
+```
+
+## Question 6 (1 point)
+```{r}
+# Assuming only these 5 players played in the game, how many points and how many rebounds did the team make in the game?
+total <- colSums(stat_matrix)
+total
+```
+
+## Question 7 (1 point)
+```{r}
+# Give an example of factor variable discussed in the introduction of "How Charts Lie"
+# (no code)
+## A factor variable discussed in the introduction of "How Charts Lie" would be whether a vote was for Hillary Clinton, Donald Trump, or another candidate, as they are categories that the "vote" can fall into.
+```
+
+## Question 8 (1 point)
+```{r}
+# Create a vector of factor variables "high", "med", and "low"
+fvariables <- c("high", "med", "low", "high", "high", "med", "low", "low", "low")
+fvariables
+factor_fvariables <- factor(fvariables, order= TRUE, levels = c("low", "med", "high"))
+factor_fvariables
+```
+
+## Question 9 (1 point)
+```{r}
+# Rename factors to 'h', 'm', 'l'
+levels(factor_fvariables) <- c("l", "m", "h")
+factor_fvariables
+```
+
+## Question 10 (1 point)
+
+```{r}
+# create a list that combines the team_matrix and your most recent vector
+# I'm assuming this means the stat_matrix from before?
+list1 <- list(stat_matrix, factor_fvariables)
+list1
+```
+
+## Question 11 (1 point)
+
+```{r}
+# load in iris dataset
+# show the first six rows of data
+head(iris)
+```
+
+## Question 12
+
+```{r}
+# how many rows are in the dataframe?
+nrow(iris)
+```
+
+## Question 13 (1 point)
+
+```{r}
+# what are the column names?
+colnames(iris)
+```
+
+## Question 14 (1 point)
+
+```{r}
+# what is the value of the 2 row, 3 column?
+iris[2,3]
+```
+
+## Question 15 (1 point)
+
+```{r}
+# what are the sepal lengths for rows 25-30?
+iris[25:30, "Sepal.Length"]
+```
+
+## Question 16 (1 point)
+
+```{r}
+# select petal length and petal width when species equals setosa
+iris[iris$Species == "setosa",c("Petal.Length", "Petal.Width")]
+```
+
+## Question 17 (2 point)
+
+```{r}
+# subset the data to include setosa and virginica flowers whose petal lengths are greater than or equal to  1.5
+# keep columns: species, petal width, and petal length
+iris_15 <- subset(iris, Petal.Length >= 1.5 & Species == c("setosa", "virginica"), c(Species, Petal.Width, Petal.Length))
+iris_15
+```
+
+## Question 18 (1 point)
+
+```{r}
+# sort the entries by sepal length within the dataframe
+position <- order(iris$Sepal.Length)
+
+iris[position, ]
+```
+
+## Question 19 (2 points)
+
+```{r}
+# print your current working directory
+getwd()
+# set your working directory to your desktop
+setwd("/Users/noahmcintire/Desktop")
+```
+

@@ -1,0 +1,45 @@
+---
+title: "A10_Noah_McIntire"
+author: "Noah McIntire (nem2pq)"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+#1
+Copy the Guinea Pig graph from plotly-1 lecture
+Add buttons to switch between Blue and Yellow Colors
+```{r}
+library(plyr)
+library(tidyverse)
+library(plotly)
+#create date
+
+tg <- ddply(ToothGrowth, c("supp", "dose"), summarise, length=mean(len))
+
+# create figure
+fig <- plot_ly(tg, x = ~dose, y = ~length, type = 'scatter', mode = 'lines', linetype = ~supp, color = I('blue')) 
+
+fig <- fig %>% layout(title = 'The Effect of Vitamin C on Tooth Growth in Guinea Pigs by Supplement Type',
+         xaxis = list(title = 'Dose in milligrams/day'),
+         yaxis = list (title = 'Tooth length'),
+         updatemenus = list(list( type ="buttons", y = 0.7, 
+           buttons = list(
+          list(method = "restyle",
+               args = list("line.color", "blue"),
+               label = "Blue"),
+          list(method = "restyle",
+               args = list("line.color", "yellow"),
+               label = "Yellow")))))
+
+fig
+```
+
+#3 
+Graph from FiveThirtyEight: https://projects.fivethirtyeight.com/2022-election-forecast/house/?cid=rrpromo
+
+Viewing the second graph down on the webpage, "Forecasting each House seat", you're able to see a lot of information all in one graphic. You can hover over any seat to see information about that specific race. Personally, one improvement I would make would be to change the visualization so that (at least on desktop version) it takes up the whole page, and use that extra space to help shape each states shape so that it looks more like it's actually shape, so that it is a bit easier to read and distinguish them.
+
+
+
+
+

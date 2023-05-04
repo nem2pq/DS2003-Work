@@ -1,0 +1,95 @@
+library(ggplot2)
+library(viridis)
+library(shiny)
+library(shinyWidgets)
+library('rsconnect')
+dataset <- read.csv("Spotify 2010 - 2019 Top 100.csv")
+dataset <- subset(dataset, dataset$top.year != 'NA')
+spot <- dataset[,-c(1, 2, 3, 5, 18)]
+invars <- spot[, c(2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)]
+names(invars) <- c('BeatsperMinute', 'Energy', 'Danceability', 'Decibel', 'Live', 'Positivity', 'Duration', 'Acoustics', 'Speech', 'Popularity', 'TopYear')
+spotvars <- colnames(invars)
+attach(spot)
+
+bootstrapPage(
+  titlePanel(div( style='text-align:center; color:#1DB954; font-family:serif;', 
+                  paste("Exploration of Top 100 Song Spotify Data (2010-2019)"))),
+  sidebarLayout(
+    position = "right",
+    sidebarPanel(
+      img(src ="spotify_logo.png", align = "center")
+    ),
+    mainPanel(
+      tags$h3("DS 2003 Fall 2022, Group 2: Mei Gilhousen, Lauren Hale, Noah McIntire", style="font-family:serif"),
+      tags$h2("Motivation", style="color:#1DB954; font-family:serif"),
+      p("Spotify as well as other music streaming platforms have become an increasingly popular way to access and listen to music. The success of a song on streaming platforms has become another way to describe the success of a music artist and an important metric to track trends in the music industry. This led us to explore this dataset, which includes the 100 top songs from spotify from years 2010-2019, and look to see if there are any trends or questions about the music industry or popular music preferences that can be answered by this data set. Investigating this data is valuable to many music platforms, because many of them use algorithms to market music to specific audiences, and predict the success of future music.
+", style='font-family:serif'),
+      br(),
+      tags$h2("Describing the Dataset", style="color:#1DB954; font-family:serif"),
+      p("This data set is an open and public data set from the Kaggle website. It includes a csv file with information about the top 100 spotify songs from the years 2010 through 2019. The variables included the song title, artist, genre, year released, date added to top hits playlist, beats per minute, energy, danceability, decibel, live (likelihood song is a live recording), positivity, duration, acousticness, speech, pop, top year, and artist type . The data is updated as recently as 2019. There are a total of 1000 observations in the data set with 17 variables total.", style='font-family:serif'),
+      br(),
+      tags$h2('Describing the Variables', style="color:#1DB954; font-family:serif"),
+      p('The variables focused on by our questions are described below.', style='font-family:serif'),
+      tags$li("Duration: the length of time each song runs, described in seconds", style='font-family:serif'),
+      tags$li("BPM: beats per minute on average", style='font-family:serif'),
+      tags$li("Positivity: positivity rating on a scale of 0-100", style='font-family:serif'),
+      tags$li("Liveness: possible present audience during performance on a scale of 0 to 100", style='font-family:serif'),
+      tags$li("Instrumentalness: how much is vocal or not on a scale of 0 to 100- higher scores meaning less vocal", style='font-family:serif'),
+      tags$li("Danceability: suitability of the track for dancing based on tempo and rhythm on a scale of 0-100", style='font-family:serif'),
+      tags$li("Energy: measure of the song’s energy and intensity, such as noise level and speed on a scale of 0-100", style='font-family:serif'),
+      tags$li("Top Year: Year that the song was added top hits playlist on Spotify", style='font-family:serif'),
+      tags$li("Loudness: Loudness is measured in overall decibels for each song. Mode references if each track is in the major or minor key, where major is indicated by a 1, and minor is indicated by a 0", style='font-family:serif'),
+      tags$li("Speechiness: presence of spoken words on a scale of 0 to 100, with a higher number meaning more words detected", style='font-family:serif'))),
+  sidebarLayout(
+    position = "right",
+    sidebarPanel(
+      selectInput("xval", label = "X Variable:",
+                  choices = list('BeatsperMinute', 'Energy', 'Danceability', 'Decibel', 'Live', 'Positivity', 'Duration', 'Acoustics', 'Speech', 'Popularity'), selected = "Positivity"),
+      selectInput("yval", "Y Variable:",
+                  choices = list('BeatsperMinute', 'Energy', 'Danceability', 'Decibel', 'Live', 'Positivity', 'Duration', 'Acoustics', 'Speech', 'Popularity'), selected = "Energy"),
+      setSliderColor(c('#1DB954', '#1DB954'), c(1, 2)),
+      sliderInput("minimum", "Lower X Limit:", min = 0, max = 215, value=0),
+      
+      sliderInput("maximum", "Upper X Limit:", min = 0, max = 355, value=355)),
+    mainPanel(
+      tags$h2("Question 1: What are possible correlations of audio features within popular music through the last decade, for example, are energy and positivity correlated?", style="color:#1DB954; font-family:serif"),
+      plotOutput("scatterplot"),
+      strong("Graph Analysis/ Discussion", style='font-family:serif'),
+      tags$ol(
+        tags$li("The first graph is an interactive scatterplot that compares two selected variables. The x and y variables are both able to be selected from two separate drop down features from the available dataset by the user in order to compare correlations across different audio features for the overall dataset.", style='font-family:serif'),
+        tags$li("The second set of widgets is a slider for the range of the x-axis. The minimum slider sets the minimum value and the maximum value sets the maximum value. This allows the user to focus on a specific range of features, since some features are more concentrated at a higher value or lower value", style='font-family:serif'),
+        tags$li("The legend to the side of the plot shows how the points are color coded by distribution of year, with colorblind accessible colors.", style='font-family:serif'),
+        tags$li("The scatterplot shows a slight positive correlation between the valence and energy of popular songs in the dataset.", style='font-family:serif')
+      ),
+    )),
+  sidebarLayout(
+    position = "right",
+    sidebarPanel(
+      selectInput("vars2","Select Variable:",choices = list('BeatsperMinute', 'Energy', 'Danceability', 'Decibel', 'Live', 'Positivity', 'Duration', 'Acoustics', 'Speech', 'Popularity'), selected="Energy"),
+      checkboxGroupInput("year", "Years to show:", choices = na.omit(unique(top.year)), selected= na.omit(unique(top.year))),
+      numericInput("jitter", "Select Jitter Width:", value =0.2, min=0.1, max=1, step = 0.1)),
+    mainPanel(
+      tags$h2("Question 2: Are there general popularity trends in the variables across different years?", style="color:#1DB954; font-family:serif"),
+      plotOutput("distplot"),
+      strong("Graph Analysis/ Discussion", style='font-family:serif'),
+      tags$ol(
+        tags$li("The second interactive graph consists of boxplots. The user is able to select the y-axis variable from an available drop down list, while the x-axis is labeled by each year in the dataset from 2010 to 2019.", style='font-family:serif'),
+        tags$li("The user is able to check the input group for the boxes for each year they want shown on the graph, which can be just one isolated year or across all years.", style='font-family:serif'),
+        tags$li("The third widget on the graph is an option to change the jitter width. The options range from 0 to 1, to help view overlapping points.", style='font-family:serif'),
+        tags$li("The graph overall shows generally flat trends in the audio features across 2010-2019 for popular songs.", style='font-family:serif')
+      ),
+      br(),
+      tags$h2("Summary and Conclusions", style="color:#1DB954; font-family:serif"),
+      p("Certain audio features such as energy and positivity are positively correlated with each other, and show relatively high rankings on the scale for audio features, suggesting that popular songs are usually upbeat and positive to listeners. It is interesting to note that positivity did not seem to have as significant of a presence in the dataset as energy did, suggesting that energy is more important to the success of a song than its perceived positivity.", style='font-family:serif'),
+      br(),
+      p("We conclude from the second graph that generally the trends for audio features such as energy are flat across the last decade, so it is unlikely that the general population changes its preferences for music characteristics. There do appear to be some outliers for the variables, for example the positivity distribution for the year 2012 is significantly lower than the general trend. ", style='font-family:serif'),
+      br(),
+      p("Some challenges with this dataset is that the data is grouped by year, and there are no date markings for week/month. This would be useful for seeing seasonal trends in audio features, rather than the aggregate year.", style='font-family:serif'),
+      br(),
+      p("Another possible challenge of the data is that Spotify is generally marketed to a younger audience, and could be leaving out more observations that are consistent with the general population. There are other music streaming platforms that engage with other audiences, and although Spotify has a large share of the market, it definitely does not capture all of it. Being able to integrate these aspects into our analysis would be the next step into further investigation of music data.", style='font-family:serif'),
+      br(),
+      tags$h2("Sources Cited", style="color:#1DB954; font-family:serif"),
+      p("Morris, M. (2022, April 9). Spotify Top 100 songs of 2010-2019. Kaggle. Retrieved December 11, 2022, from", style='font-family:serif'),
+      tags$a(href="https://www.kaggle.com/datasets/muhmores/spotify-top-100-songs-of-20152019", "https://www.kaggle.com/datasets/muhmores/spotify-top-100-songs-of-20152019", style='font-family:serif')
+    )
+  ))

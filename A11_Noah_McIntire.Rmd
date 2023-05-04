@@ -1,0 +1,94 @@
+---
+title: "A11_Noah_McIntire"
+author: "Noah McIntire (nem2pq)"
+date: "`r Sys.Date()`"
+output: html_document
+---
+# URLs to Shiny Apps
+Part 1: https://nem2pq.shinyapps.io/shinyapp_11pt1/
+Part 2: http://nem2pq.shinyapps.io/shinyapp_assignment11?_ga=2.45251111.2033156485.1670004182-29570985.1670004182
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(shiny)
+```
+
+
+```{r}
+covid <- read.csv('WHO-COVID-19-global-table-data.csv')
+covid$mortalityRate <- covid$Deaths...cumulative.total / covid$Cases...cumulative.total
+```
+
+
+```{r}
+# make a subset of just 3 countries per region
+covid$country <- row.names(covid)
+covidSubset <- covid[covid$country %in% c("France", "Germany", "Italy", "Republic of Korea", "Jqpan", "Australia", "Argentina", "Mexico", "Iran (Islamic Republic of)", "Canada", "India", "Indonesia", "Thailand", "South Africa", "Iraq", "Jordan", "Ethiopa", "Kenya", "Zambia"),]
+se <- sd(na.omit(covid$mortalityRate))/sqrt(length(na.omit(covid$mortalityRate)))
+print(se)
+```
+
+```{r}
+
+
+ui <- fluidPage(
+  selectInput("Region", label = "Who Region:", choices = c("Africa", "Americas", "Eastern Mediterranean", "Europe", "South-East Asia", "Western Pacific"), selected = "Africa"),
+  plotOutput("mortplot"))
+
+
+# Calculate SE and add for error bars
+server <- function(input, output){
+    output$mortplot <- renderPlot({
+      covidSubset1 <- covidSubset[covidSubset$Name == input$Region,]
+      ggplot(covidSubset1, aes(x=country, y=mortalityRate)) + geom_bar(stat="identity") + ylab('Mortality Rate') +
+  xlab('Country') + labs(title="Mortality Rate in Various WHO Regions") + geom_errorbar(aes(ymin = mortalityRate-se, ymax = mortalityRate+se, width = 0.4)) +theme_bw()
+    })}
+
+shinyApp(ui = ui, server = server) 
+```
+
+
+# Part 2
+https://www.kaggle.com/datasets/whenamancodes/predict-diabities
+
+## Description of the Data Set
+This data set from Kaggle, is originally from the National Institute of Diabetes and Digestive and Kidney Diseases. The data set is a potential machine learnig training data set to see if there a predictors that can be used to see if someone has diabetes. This is a selection from a larger database, where all patients selected are of Pima Indian heritage and are at least 21 years of age. Some of the Variables in the data include:
+- Pregnancies: Number of pregnancies the individual has had (Continuous)
+- Glucose: Count to measure the glucose level in the blood(Continuous)
+- Blood Pressure:A numeric value to represent the blood pressure of the individual (Continuous)
+- BMI: The body mass index of the individual (Continuous)
+
+From this data set, I have chosen to use Glucose as A and Blood pressure as B, and will explore the relationship between the two with an interactive scatterplot that includes a loess regression.
+
+
+```{r}
+diabetes <- read.csv('diabetes.csv')
+ui <- fluidPage(
+   sidebarLayout(
+    sidebarPanel(
+    selectInput("degree", label = h3("Select Degree:"), 
+    choices = list( 0, 1, 2), 
+    selected = 2),
+    sliderInput("span", label = h3("Span adjustment:"),
+              min = 0.2, max = 0.9, value = 0.5, step = 0.1)
+    ),
+  mainPanel(
+     plotOutput("diaplot")
+    )
+  ))
+
+server <- function(input, output){
+   
+   output$diaplot <- renderPlot({
+     
+    ggplot(diabetes, aes(x=Glucose, y=BloodPressure)) + geom_point(alpha=0.3) + geom_smooth(method="loess", formula=y ~ poly(x, as.numeric(input$degree)), se=FALSE, span=input$span) + theme_bw()
+    })}
+
+shinyApp(ui = ui, server = server) 
+```
+Based off of the graph produced above, we can see that glucose and blood pressure do not have a relationship of any meaningful value. By changing the degree of the loess line, we can see that it foolows a different path, with 0 creating no line, as it cannot form a relationship with the x axis. The line that seems to fit closest is of degree one, which can either be smoother by increasing the span value or more form fitting by reducing the span value.
+
+

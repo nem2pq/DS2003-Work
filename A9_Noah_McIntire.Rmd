@@ -1,0 +1,300 @@
+---
+title: "Assignment 9 - plotly (15 pts)"
+author: "Noah McIntire(nem2pq)"
+
+output: html_document
+---
+```{r}
+library(tidyverse)
+library(plotly)
+```
+
+```{r}
+data <- as.data.frame(iris)
+head(data)
+```
+
+# create a scatterplot of petal length vs petal width colored by species using ggplot2. Set you colors manually. 
+
+```{r}
+p1 <- ggplot(data, aes(Petal.Length, Petal.Width)) +
+  geom_point(aes(color = Species), position = 'jitter') +
+  scale_color_manual(values = c('#7B435B', '#9FA0C3', '#BCF8EC')) +
+  theme_minimal() +
+  ylab('Petal Width') +
+  xlab('Petal Length') +
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.background = element_blank())
+
+
+p1
+```
+
+# Convert your plot above to an interactive graph using `ggplotly`
+
+```{r}
+ggplotly(p1)
+```
+
+# Now code the the above plot directly in `plot_ly`
+
+1. Manipulate data as needed
+```{r}
+setosa <- data %>% filter(Species == 'setosa')
+versicolor <- data %>% filter(Species == 'versicolor')
+virginica <- data %>% filter(Species == 'virginica')
+```
+
+2. initialize your plotly plot
+```{r}
+p2 <- plot_ly(type = 'scatter', mode = 'markers') 
+```
+
+3. add your Setosa trace 
+```{r}
+p2 <- p2 %>%
+  add_trace(
+    x = setosa$Petal.Length,
+    y = setosa$Petal.Width,
+    marker = list(
+      color = '#7B435B',
+      size = 10),
+    name = 'Setosa'
+  ) 
+p2
+```
+
+4. Add your versicolor trace
+```{r}
+p2 <- p2 %>%
+  add_trace(
+    x = versicolor$Petal.Length,
+    y = versicolor$Petal.Width,
+    marker = list(
+      color = '#9FA0C3',
+      size = 10),
+    name = 'Versicolor'
+  ) 
+
+p2
+```
+
+5. Add your virginica trace
+```{r}
+p2 <- p2 %>%
+  add_trace(
+    x = virginica$Petal.Length,
+    y = virginica$Petal.Width,
+    marker = list(
+      color = '#BCF8EC',
+      size = 10),
+    name = 'Virginica'
+  ) 
+
+p2
+
+```
+
+6. Update the tooltip to read petal width: x.x petal length: x.x
+```{r}
+p2 <- plot_ly(type = 'scatter', mode = 'markers') 
+
+p2 <- p2 %>%
+  add_trace(
+    x = setosa$Petal.Length,
+    y = setosa$Petal.Width,
+    marker = list(
+      color = '#7B435B',
+      size = 10),
+    name = 'Setosa',
+    hovertemplate = 'Petal Width: %{y} <br>Petal Length: %{x}'
+  ) 
+
+p2 <- p2 %>%
+  add_trace(
+    x = versicolor$Petal.Length,
+    y = versicolor$Petal.Width,
+    marker = list(
+      color = '#9FA0C3',
+      size = 10),
+    name = 'Versicolor',
+    hovertemplate = 'Petal Width: %{y} <br>Petal Length: %{x}'
+  ) 
+
+p2 <- p2 %>%
+  add_trace(
+    x = virginica$Petal.Length,
+    y = virginica$Petal.Width,
+    marker = list(
+      color = '#BCF8EC',
+      size = 10),
+    name = 'Virginica',
+    hovertemplate = 'Petal Width: %{y} <br>Petal Length: %{x}'
+  ) 
+
+p2
+
+```
+
+7. Add graph title and remove the gridlines
+```{r}
+p2 <- plot_ly(type = 'scatter', mode = 'markers') 
+
+p2 <- p2 %>%
+  add_trace(
+    x = setosa$Petal.Length,
+    y = setosa$Petal.Width,
+    marker = list(
+      color = '#7B435B',
+      size = 10),
+    name = 'Setosa',
+    hovertemplate = 'Petal Width: %{y} <br>Petal Length: %{x}'
+  ) 
+
+p2 <- p2 %>%
+  add_trace(
+    x = versicolor$Petal.Length,
+    y = versicolor$Petal.Width,
+    marker = list(
+      color = '#9FA0C3',
+      size = 10),
+    name = 'Versicolor',
+    hovertemplate = 'Petal Width: %{y} <br>Petal Length: %{x}'
+  ) 
+
+p2 <- p2 %>%
+  add_trace(
+    x = virginica$Petal.Length,
+    y = virginica$Petal.Width,
+    marker = list(
+      color = '#BCF8EC',
+      size = 10),
+    name = 'Virginica',
+    hovertemplate = 'Petal Width: %{y} <br>Petal Length: %{x}'
+  ) 
+
+p2 <- p2 %>%
+  layout(title = 'Scatterplot of Petal Length by Petal Width',
+         xaxis = list(title = 'Petal Length', showgrid = F),
+         yaxis = list(title = 'Petal Width', showgrid = F, zeroline = F))
+        
+
+p2
+```
+
+
+
+Homework:
+
+9. Take the above graph and make it 3D by adding Sepal Length on the z-axis. 
+```{r}
+# Referenced plotly-1.html from class to complete this
+p3 <- plot_ly(type = 'scatter3d', mode = 'markers')  
+
+p3 <- p3 %>%
+  add_trace(
+    x = setosa$Petal.Length,
+    y = setosa$Petal.Width,
+    z = setosa$Sepal.Length,
+    marker = list(
+      color = '#E389B9',
+      size = 10,
+      line = list(
+        color = 'lightgray',
+        width = .5
+      )
+      ),
+    name = 'Setosa',
+    hovertemplate = 'Petal Width: %{y} <br>Petal Length: %{x} <br>Sepal Length: %{z}'
+  ) 
+
+p3 <- p3 %>%
+  add_trace(
+    x = versicolor$Petal.Length,
+    y = versicolor$Petal.Width,
+    z = versicolor$Sepal.Length,
+    marker = list(
+      color = '#288BA8',
+      size = 10,
+      line = list(
+        color = 'lightgray',
+        width = .5
+      )),
+    name = 'Versicolor',
+    hovertemplate = 'Petal Width: %{y} <br>Petal Length: %{x} <br>Sepal Length: %{z}'
+  ) 
+
+p3 <- p3 %>%
+  add_trace(
+    x = virginica$Petal.Length,
+    y = virginica$Petal.Width,
+    z = virginica$Sepal.Length,
+    marker = list(
+      color = '#746AB0',
+      size = 10,
+      line = list(
+        color = 'lightgray',
+        width = .5
+      )),
+    name = 'Virginica',
+    hovertemplate = 'Petal Width: %{y} <br>Petal Length: %{x} <br>Sepal Length: %{z}'
+  ) 
+
+p3 <- p3 %>%
+  layout(title = 'Scatterplot of Petal Length by Petal Width by Sepal Length',
+         scene = list(xaxis = list(title = "Petal Length"),
+                      yaxis = list(title = "Petal Length"),
+                      zaxis = list(title = "Sepal Length")))
+        
+
+p3
+```
+
+10. Create grouped boxplots where each iris dataset measure in on the x-axis with 3 boxplots for each measure representing the species. Use your own cohesive color palette using coolors.co. Don't forget to include all the parts of a chart. 
+
+```{r}
+# Sites referenced to complete this code (though none of it is copied or a "chunk" of code):
+# https://plotly.com/r/box-plots/#grouped-box-plots
+# https://www.geeksforgeeks.org/how-to-create-grouped-box-plot-in-plotly/
+# https://www.rdocumentation.org/packages/plotly/versions/4.10.0/topics/add_trace
+
+p4 <- plot_ly(type = 'box') 
+
+x1 = c(replicate(50, 'Petal Length'), replicate(50, 'Petal Width'), replicate(50, 'Sepal Length'))
+
+p4 <- p4 %>% add_trace(
+    type='box',
+    x = x1,
+    y = c(versicolor$Petal.Length, versicolor$Petal.Width, versicolor$Sepal.Length),
+    color = '#482C3D',
+    name = 'Versicolor'
+  ) 
+p4 <- p4 %>%
+  add_trace(
+    type='box',
+    x = x1,
+    y = c(setosa$Petal.Length, setosa$Petal.Width, setosa$Sepal.Length),
+    color = '#537D8D',
+    name = 'Setosa'
+  ) 
+p4 <- p4 %>%
+  add_trace(
+    type='box',
+    x = x1,
+    y = c(virginica$Petal.Length, virginica$Petal.Width, virginica$Sepal.Length),
+    color = '#E5D352',
+    name = 'Virginica'
+  ) 
+
+p4 <- p4 %>%
+  layout(title = 'Grouped Boxplot of Petal Length, Petal Width, and Sepal Length by Species', boxmode='group', xaxis = list(showgrid = F, zeroline = T),
+         yaxis = list(title = 'Centimeters', showgrid = F, zeroline = T))
+
+p4
+
+```
+
+
+
+

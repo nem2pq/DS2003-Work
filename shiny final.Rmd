@@ -1,0 +1,150 @@
+---
+title: "Final Project"
+author: "Mei Gilhousen"
+date: "2022-12-06"
+output: html_document
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(yaml)
+library(ggplot2)
+library(shiny)
+library(dplyr)
+library(shinyWidgets)
+```
+
+```{r}
+rsconnect::setAccountInfo(name='mei0504g',
+			  token='DBF30375DAF2BCB303919D0D3D209179',
+			  secret='VO/AZw2RvmvQJendjhay1wI03hPE5q6w9pxUYPzo')
+```
+
+
+
+```{r}
+dataset<-read.csv("Spotify 2010 - 2019 Top 100.csv")
+head(dataset)
+```
+
+
+```{r}
+spotdata<-dataset[,-c(1,2,3,5,18)]
+head(spotdata)
+```
+
+```{r}
+shinyApp(
+  ui=fluidPage(
+    sidebarLayout(
+      sidebarPanel(
+sliderInput("minimum", "Minimum depth range:", min = 0, max = 100, value=0),
+sliderInput("maximum", "Maximum depth range:", min = 0, max = 100, value=100), 
+selectInput('xval', label =  'pick x', choices = colnames(spotdata)),
+selectInput('yval', label = 'pick y', choices = colnames(spotdata))),
+mainPanel(
+  plotOutput('musicdata')
+)
+)),
+server=function(input, output){
+
+  output$musicdata<-renderPlot({
+  ggplot(spotdata, aes_string(x=input$xval, y=input$yval)) + geom_point(aes(color=spotdata$artist.type)) + xlim(input$minimum,input$maximum)
+})})
+```
+
+
+```{r}
+shinyApp(
+  ui=fluidPage(
+    sidebarLayout(
+      sidebarPanel(
+sliderInput("minimum", "Minimum depth range:", min = 0, max = 100, value=0),
+sliderInput("maximum", "Maximum depth range:", min = 0, max = 100, value=100), 
+selectInput('xval', label =  'pick x', choices = colnames(spotdata)),
+selectInput('yval', label = 'pick y', choices = colnames(spotdata))),
+mainPanel(
+  plotOutput('musicdata')
+)
+)),
+server=function(input, output){
+
+  output$musicdata<-renderPlot({
+  ggplot(spotdata, aes_string(x=input$xval, y=input$yval)) + geom_point(aes(color=spotdata$artist.type)) + xlim(input$minimum,input$maximum)
+})})
+```
+
+```{r}
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("ComplexHeatmap")
+
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("InteractiveComplexHeatmap")
+
+library(ComplexHeatmap)
+library(InteractiveComplexHeatmap)
+
+```
+
+```{r}
+mapdata<-subset(dataset, dataset$top.year==2019)
+mapdata<-mapdata[,-c(1,2,3,4,5,12,13,16,17)]
+
+mapdata<-mapdata[,2:ncol(mapdata)]/100
+mapdata<-as.data.frame(mapdata)
+as.matrix(mapdata)
+```
+
+
+```{r}
+data(mapdata) 
+hmap = Heatmap(mapdata, name = "spotify data",
+    show_row_names = FALSE, show_column_names = TRUE)
+hmap = draw(hmap)
+
+ui = fluidPage(
+    h3("Spotify Heatmap"),
+    p("Heatmap of spotify data"),
+    InteractiveComplexHeatmapOutput()
+)
+
+server = function(input, output, session) {
+    makeInteractiveComplexHeatmap(input, output, session, hmap)
+}
+
+shinyApp(ui, server)
+```
+
+```{r}
+spotdata$newYear <- toString
+ui <- fluidPage(
+  selectInput("plots","boxplots",choices = names(spotdata)),
+  checkboxGroupInput("Years", "Years to show:",
+                     c("2010","2011",
+                       "2012","2013",
+                       "2014" ,"2015",
+                        "2016", "2017","2018", "2019")),
+  
+  plotOutput("myplot"))
+
+server <- function(input, output, session) {
+
+  output$myplot <- renderPlot({
+    ggplot(data=spotdata[spotdata$year.released %in% input$Years,], aes(x=year.released, y=input$plots)) +geom_boxplot()
+  })
+}
+
+shinyApp(ui, server)
+```
+
+
+
+```{r}

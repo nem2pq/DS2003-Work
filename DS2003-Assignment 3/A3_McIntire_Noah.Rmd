@@ -1,0 +1,122 @@
+---
+title: "Assignment 3 - Descriptive Stats (20 pts)"
+author: "Noah McIntire (nem2pq)"
+output: html_document
+---
+
+**You will submit the html output.**
+
+This assignment will use the popular Titanic dataset.
+Find the data dictionary for the dataset here: https://www.kaggle.com/competitions/titanic/data
+
+```{r}
+# Load the dataset; assign the dataframe to an object called 'titanic'
+titanic <- read.csv("/Users/noahmcintire/Desktop/DS2003/DS2003-Assignment 3/data/titanic.csv")
+```
+
+## Question 1 (0.5 point)
+```{r}
+# Look at the first 6 rows of data
+head(titanic)
+```
+
+## Question 2 (2 point)
+```{r}
+# (1) define the variable 'fare' (2) assign this column to vector called 'fare' & sort values from smallest to largest
+
+# fare: 
+fare <- titanic$fare
+fare <-sort.int(fare, decreasing = FALSE)
+head(fare, 20)
+```
+
+## Question 3 (1 point)
+```{r}
+# subset the dataframe to include passengers in 2nd class and include the columns for name, age, and sex
+titanic_2 <- subset(titanic, pclass == 2, c(name, age, sex))
+titanic_2
+```
+
+## Question 4 (2 point)
+```{r}
+# How many NAs are in the full dataset? 
+sum(is.na(titanic))
+# How many NAs are in the 'age' column? (hint: you may need to Google)
+sum(is.na(titanic$age))
+```
+
+## Question 5 (1 point)
+```{r}
+# Recode the variable 'sex' so that 'male' becomes 'm' and 'female' becomes 'f'
+titanic$sex[titanic$sex=="male"]<-"m"
+titanic$sex[titanic$sex=="female"]<-"f"
+head(titanic$sex)
+```
+
+## Question 6 (.5 point)
+```{r}
+# print summary statistics for the dataset
+summary(titanic)
+```
+
+## Question 7 (1 point)
+```{r}
+# What is the average ticket price for a first class ticket?
+# (optional: round to 2 decimal points)
+mean(subset(titanic, pclass == 1)$fare)
+```
+
+## Question 8 (1 point)
+```{r}
+# Plot a histogram for the fare price using attach()
+attach(titanic)
+hist(titanic$fare)
+detach(titanic)
+```
+
+## Question 9 (1 point)
+```{r}
+# Using lattice plot a histogram of fare price by port
+# If unfamiliar, you will need to look up the lattice package
+# histogram(~ variable | dividing variable, data = data_name)
+library(lattice)
+histogram(~ titanic$fare | titanic$embarked)
+```
+
+
+## Question 10 (1 point)
+```{r}
+# Write one sentence interpreting the graph from Question  9
+# By splitting up the groupings by the port they are on, we can see that most passengers paid over a hundred dollars for their ticket embarked from Cherbourg.
+```
+
+## Question 11 (1 point)
+```{r}
+# Create a barplot of cabin class vs sex
+barplot(table(titanic$pclass, titanic$sex), main = 'Passenger Class by Sex', legend = TRUE)
+```
+
+## Question 12 (4 point)
+```{r}
+# (1) create a vector of 10 numbers which includes a few NAs (2) confirm it is a vector (3) sum the missing values (4) remove the missing values from your vector and then remove your vector object from the workspace
+vect <- c(1, NA, 3, 4, 5, NA, 7, NA, 9, NA)
+is.vector(vect)
+sum(vect, na.rm = TRUE)
+vect <- vect[!is.na(vect)]
+vect
+rm(vect)
+```
+
+## Question 13 (4 points)
+```{r}
+# (1) create a matrix of numbers from 1 to 500 going by 2's that is 25 rows by 10 columns (2) confirm it is a matrix (3) get the dimensions of the matrix (4) subset rows 10-15 and columns 3-6 (5)
+m <- matrix(seq(1, 500, by=2), nrow=25, ncol=10)
+is.matrix(m)
+dim(m)
+m[c(10:15), c(3:6)]
+```
+
+
+
+
+

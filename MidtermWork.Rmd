@@ -1,0 +1,53 @@
+---
+title: "Project Work"
+author: "Noah McIntire"
+date: "2022-10-10"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+#Packages
+library(ggplot2)
+library(ggExtra)
+library(dplyr)
+library(tidyverse)
+library(RColorBrewer)
+#Data
+airBnbNYC <- read.csv("AB_NYC_2019.csv")
+```
+
+Answering Questions:
+```{r}
+head(airBnbNYC)
+# add labels, make look nice all that stuff
+ggplot(airBnbNYC, aes(room_type, price)) + geom_bar(position = "dodge",
+           stat = "summary",fun = "mean")
+```
+
+
+```{r}
+#Price by Neighborhood- mean
+ggplot(airBnbNYC) + geom_bar(position = "dodge",
+           stat = "summary",fun = "mean", aes(neighbourhood_group, price, col=room_type, fill=room_type)) + scale_fill_brewer(palette="Spectral") +labs(title='Mean AirBnB Price', subtitle='by Borough and Room Type', xlab='Borough', ylab='Mean Price')
+```
+```{r}
+ggplot(airBnbNYC[airBnbNYC$neighbourhood_group=='Manhattan',]) + geom_bin2d(aes(x=availability_365, y=price))
+```
+```{r}
+ggplot(airBnbNYC, aes(number_of_reviews, price)) + geom_point(aes(color=neighbourhood_group))
+```
+```{r}
+ggplot(airBnbNYC[airBnbNYC$neighbourhood_group=='Manhattan',], aes(number_of_reviews, price)) + geom_point(aes(color=neighbourhood))
+```
+```{r}
+ggplot(airBnbNYC, aes(minimum_nights, price)) + geom_bar(position = "dodge",
+           stat = "summary",fun = "mean") + xlim(0,20)
+```
+```{r}
+ggplot(airBnbNYC)+geom_boxplot(aes(x=neighbourhood_group, y=availability_365))
+```
+
